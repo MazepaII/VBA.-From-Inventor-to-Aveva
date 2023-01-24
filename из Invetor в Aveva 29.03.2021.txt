@@ -1,0 +1,906 @@
+Sub тест()
+
+Dim Массив_относит_коорд(), ВысотаВытягиваний(), ЦентрТочкПоверхнВытягивания_Верхн(), ЦентрТочкПоверхнВытягивания_Нижн(), _
+КрайняяТочкПоверхнВытягивания_Верхн(), КрайняяТочкПоверхнВытягивания_Нижн(), НомерКоордXYZ(), ПерваяТочка2DЭскиза(), Массив_НЕотносит_коорд(), РастояниеОтПервПоверх(), РастояниеОтПоследнПоверх(), _
+УголВытягиваний(), НаправлениеОсиЭскиза(), Угол_между_осями_X(), Угол_между_осями_Y(), Угол_между_осями_X_рад(), Угол_между_осями_Y_рад(), Угол_между_осями_X_ист(), Угол_между_осями_Y_ист(), _
+Угол_Конечный(), Угол_между_осями_Y_ZX_рад(), Угол_между_осями_Y_ZX(), Угол_Конечный_ZX(), Угол_между_осями_Y_ZX_ист(), _
+Угол_между_осями_X_ZY_рад(), Угол_между_осями_X_ZY(), Угол_Конечный_ZY(), Угол_между_осями_X_ZY_ист()
+'массивы
+Dim КоличТочек, счетчикX, счетчикY, счетчикZ As Integer
+
+Const pi = 3.14159265358979
+
+
+'Dim New_Sketch3d As Sketch3D
+Dim оТочка3d As SketchPoint3D
+Dim tools As MeasureTools
+Set tools = ThisApplication.MeasureTools
+Dim Doc As PartDocument
+Set Doc = ThisApplication.ActiveDocument
+Set ЭтотДокум = ThisApplication
+Dim oFeatures As PartFeatures
+Set oFeatures = ThisApplication.ActiveDocument.ComponentDefinition.Features
+Set oWorkPoints = ThisApplication.ActiveDocument.ComponentDefinition.WorkPoints
+Set oSketch3d = ThisApplication.ActiveDocument.ComponentDefinition.Sketches3D
+Dim oSketches As PlanarSketches
+Set oSketches = ThisApplication.ActiveDocument.ComponentDefinition.Sketches
+Dim oTG As TransientGeometry                ' Для создания точки
+Set oTG = ThisApplication.TransientGeometry ' Для создания точки
+Dim oCreateObjectCollection As ObjectCollection   'содержит выбраные элементы
+Set oCreateObjectCollection = ThisApplication.TransientObjects.CreateObjectCollection
+Dim oWorkPlanes As WorkPlanes
+Set oWorkPlanes = Doc.ComponentDefinition.WorkPlanes
+Dim Круг_эскиз As SketchCircle
+
+
+t = Timer
+Время = 0
+    
+    
+'t = Timer
+НачальнКоличПлоск = Doc.ComponentDefinition.WorkPlanes.Count
+НачальнКоличЭскизов = oSketches.Count
+'Метод oSketches.Item(2).ModelToSketchSpace, который берет трехмерную координату в пространстве модели, проецирует ее на плоскость эскиза по нормали к плоскости и
+'возвращает объект Point2d, содержащий полученную координатную точку в пространстве эскиза.
+
+
+
+'ВысотаВыдавливания = Doc.ComponentDefinition.Features.Item(2).Extent.Distance.Expression
+'ЗDэскиз_точка_коорт_Х = Doc.ComponentDefinition.Sketches3D.Item(2).SketchPoints3D.Item(1).Geometry.X
+'ЗDэскиз_точка_коорт_Y = Doc.ComponentDefinition.Sketches3D.Item(2).SketchPoints3D.Item(1).Geometry.Y
+'ЗDэскиз_точка_коорт_Z = Doc.ComponentDefinition.Sketches3D.Item(2).SketchPoints3D.Item(1).Geometry.Z
+'Doc.ComponentDefinition.Sketches.Item(3).AxisEntity = Doc.ComponentDefinition.WorkAxes.Item(1)
+'Doc.ComponentDefinition.Sketches.Item(3).AxisEntityGeometry.Direction = Doc.ComponentDefinition.WorkAxes.Item(1).Line.Direction
+'Doc.ComponentDefinition.Sketches.Item(3).NaturalAxisDirection = True
+
+    
+    
+
+    'создатьточку по коордиатам
+    'Set oWPs__ = Doc.ComponentDefinition.WorkPoints.AddFixed(oTG.CreatePoint(-5.55, 1.5, 11.1))
+
+    'количество рабочих точек у эскизов разных вытягиваний
+    ' ОбщееКоличТочек = 0
+    ' For j = 1 To oFeatures.Count
+     '
+     ''   For i = 1 To oFeatures.Item(j).Profile.Count
+     '     ОбщееКоличТочек = ОбщееКоличТочек + oFeatures.Item(j).Profile.Item(i).Count
+     '    Next i
+     'Next j
+    
+    'создаем массив точек
+    'Dim M_WPs() As WorkPoint
+    'Erase M_WPs 'отчистить массив
+    'ReDim M_WPs(1 To ОбщееКоличТочек) 'Задаем размер массива
+    'Dim Первая_точка_контера_вытяг() As WorkPoint
+    'Erase Первая_точка_контера_вытяг 'отчистить массив
+    'ReDim Первая_точка_контера_вытяг(1 To oFeatures.Count) 'Задаем размер массива
+ '  Set M_WPs(2) = oWorkPoints.AddFixed(oFeatures.Item(1).Profile.Wires.Item(1).Edges.Item(2).Geometry.StartPoint)       'создает точки по эскизу вытягивания
+  
+   
+    'опрос всех вытягиывний и других, получаем точки рабочих эскизов и создаем по ним 3D эскизы
+    'КоличТочек = 0
+    'номер_точки = 0
+    'НаибольшКоличТочекВЭскизе = 0
+    'For j = 1 To oFeatures.Count
+    '  'Set New_Sketch3d = Doc.ComponentDefinition.Sketches3D.Add ' Создать 3D эскиз
+    '  КоличТочек = oFeatures.Item(j).Profile.Item(1).Count
+    '  If НаибольшКоличТочекВЭскизе < КоличТочек Then
+    '     НаибольшКоличТочекВЭскизе = КоличТочек
+    '  End If
+      'Первая точка контера вытягивания
+      'Set Первая_точка_контера_вытяг(j) = oWorkPoints.AddByPoint(oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint)
+      'If Первая_точка_контера_вытяг(j).Name = "Первая_точка_контера_вытяг_" & j Then
+      '   Первая_точка_контера_вытяг(j).Delete
+      'Else
+      '   Первая_точка_контера_вытяг(j).Name = "Первая_точка_контера_вытяг_" & j 'зададим имя точке
+      'End If
+      
+    '  For i = 1 To oFeatures.Item(j).Profile.Item(1).Count '(идем по точкам первого эскиза в вытягивании)
+   '     номер_точки = номер_точки + 1
+   '     Set M_WPs(номер_точки) = oWorkPoints.AddByPoint(oFeatures.Item(j).Profile.Item(1).Item(i).StartSketchPoint)  'создает точки по эскизу вытягивания
+    '    Set оТочка3d = New_Sketch3d.SketchPoints3D.Add(M_WPs(номер_точки).Point) 'заносим точку в 3D эскиз
+   '     ' Set M_WPs(i) = oWorkPoints.AddByTwoLines(oFeatures.Item(2).Profile.Item(1).Item(1), oFeatures.Item(2).Profile.Item(1).Item(2))
+   '   Next i
+    
+  '  Next j
+    'опрос всех вытягиывний и других, получаем точки контера вытягивания и других
+    ' Определим наибольшее количество точек в контуре вытягивания среди всех вытягиваний и других операций
+    КоличТочек = 0
+    НаибольшКоличТочекВЭскизе = 0
+    For j = 1 To oFeatures.Count
+      КоличТочек = oFeatures.Item(j).Profile.Item(1).Count
+      If НаибольшКоличТочекВЭскизе < КоличТочек Then
+         НаибольшКоличТочекВЭскизе = КоличТочек
+      End If
+    Next j
+    'получаем точки контера вытягивания и других
+    Dim Массив_точек_контура_вытягиваний() As Point
+    Erase Массив_точек_контура_вытягиваний 'отчистить массив
+    ReDim Массив_точек_контура_вытягиваний(1 To oFeatures.Count, 1 To НаибольшКоличТочекВЭскизе) 'Задаем размер массива
+    For j = 1 To oFeatures.Count
+        For i = 1 To oFeatures.Item(j).Profile.Item(1).Count '(идем по точкам первого эскиза в вытягивании)
+           Set Массив_точек_контура_вытягиваний(j, i) = oFeatures.Item(j).Profile.Item(1).Item(i).StartSketchPoint.Geometry3d
+        Next i
+    Next j
+    
+    'Erase Позиция_элем 'отчистить массив
+    'ReDim Позиция_элем(1 To oFeatures.Count, 1 To 1, 1 To 3) '(колич вытягиван,колич эскизов,3 коорд) задаем размер таблицы
+    Erase Массив_относит_коорд 'отчистить массив
+    ReDim Массив_относит_коорд(1 To oFeatures.Count, 1 To 1, 1 To НаибольшКоличТочекВЭскизе, 1 To 3) ''(колич вытягиван,колич эскизов, общее колич точек во всех эскизах,3 коорд) 'задаем размер таблицы
+    Erase Массив_НЕотносит_коорд 'отчистить массив
+    ReDim Массив_НЕотносит_коорд(1 To oFeatures.Count, 1 To 1, 1 To НаибольшКоличТочекВЭскизе, 1 To 3) ''(колич вытягиван,колич эскизов, общее колич точек во всех эскизах,3 коорд) 'задаем размер таблицы
+    Erase НомерКоордXYZ
+    ReDim НомерКоордXYZ(1 To oFeatures.Count)
+    Erase ПерваяТочка2DЭскиза
+    ReDim ПерваяТочка2DЭскиза(1 To oFeatures.Count, 1 To 1, 1 To 3)
+    Erase НаправлениеОсиЭскиза
+    ReDim НаправлениеОсиЭскиза(1 To oFeatures.Count, 1 To 3) '(Колич элементов вытяг или др.,три оси X,Y и Z)
+    
+    Dim Нулевая_точка_3D() As Point
+    Erase Нулевая_точка_3D 'отчистить массив
+    ReDim Нулевая_точка_3D(1 To Doc.ComponentDefinition.Sketches.Count) As Point 'Задаем размер массива
+    Dim Точка_оси_Х_WPs() As WorkPoint
+    Erase Точка_оси_Х_WPs 'отчистить массив
+    ReDim Точка_оси_Х_WPs(1 To Doc.ComponentDefinition.Sketches.Count) As WorkPoint 'Задаем размер массива
+    Dim Точка_оси_Y_WPs() As WorkPoint
+    Erase Точка_оси_Y_WPs 'отчистить массив
+    ReDim Точка_оси_Y_WPs(1 To Doc.ComponentDefinition.Sketches.Count) As WorkPoint 'Задаем размер массива
+
+    
+    Erase Угол_между_осями_X
+    ReDim Угол_между_осями_X(1 To oSketches.Count)
+    Erase Угол_между_осями_Y
+    ReDim Угол_между_осями_Y(1 To oSketches.Count)
+    Erase Угол_между_осями_X_рад
+    ReDim Угол_между_осями_X_рад(1 To oSketches.Count)
+    Erase Угол_между_осями_Y_рад
+    ReDim Угол_между_осями_Y_рад(1 To oSketches.Count)
+    Erase Угол_между_осями_X_ист
+    ReDim Угол_между_осями_X_ист(1 To oSketches.Count)
+    Erase Угол_между_осями_Y_ист
+    ReDim Угол_между_осями_Y_ист(1 To oSketches.Count)
+    Erase Угол_Конечный
+    ReDim Угол_Конечный(1 To oSketches.Count)
+    
+    'Направление осей эскиза
+    Количество_эскизов = Doc.ComponentDefinition.Sketches.Count
+    For j = 1 To Doc.ComponentDefinition.Sketches.Count
+      'Сколько линий в эскизе
+      Колич_лин_в_зскизе = oSketches.Item(j).SketchLines.Count
+      'Создадим нулеувую точку эскиза в 3D пространстве
+      Set Нулевая_точка_3D(j) = Doc.ComponentDefinition.Sketches.Item(j).SketchToModelSpace(oTG.CreatePoint2d(0, 0))
+      'Нулевая_точка_3D(j).Name = "Нулевая_точка_эск_" & j 'зададим имя точке
+      '--Создаем линии  в эскизе по осям модели и эскиза
+      'создадим 3d точку c координатой +1 по Х
+      Х = Нулевая_точка_3D(j).X
+      Y = Нулевая_точка_3D(j).Y
+      Z = Нулевая_точка_3D(j).Z
+      'oSketches.Item(j).Edit
+      'Set Точка_оси_Х_WPs(j) = oWorkPoints.AddFixed(oTG.CreatePoint(Х + 1, Y, Z))
+      'создадим 3d точку c координатой +1 по Y
+      'Set Точка_оси_Y_WPs(j) = oWorkPoints.AddFixed(oTG.CreatePoint(Х, Y + 1, Z))
+      'передадим 3D точку Х+1 в плоскость эскииза и строем линию по оси модели
+      Set Координаты_оси_Х_эскиза = oSketches.Item(j).ModelToSketchSpace(oTG.CreatePoint(Х + 1, Y, Z)) 'Получаем координыты точки из 3D пространства в пространстве эскиза
+      'Set Точка_оси_Х_эскиза = oSketches.Item(j).SketchPoints.Add(Координаты_оси_Х_эскиза) 'создаем точку
+      Set Линия_оси_X_Модели_в_эскизе = oSketches.Item(j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Координаты_оси_Х_эскиза) 'создадим линию из нуля по оси Х модели
+      
+      'Debug.Print Timer - t & " сек 1"
+      'ТЕСТ создадим не видемую линию
+      'Set ТЕСТЛиния_оси_X_Модели_в_эскизе = oTG.CreateLineSegment2d(oTG.CreatePoint2d(0, 0), Координаты_оси_Х_эскиза)
+      ''Debug.Print Timer - t & " сек 2"
+      'Задаем размер лини
+       Call oSketches.Item(j).DimensionConstraints.AddTwoPointDistance(Линия_оси_X_Модели_в_эскизе.StartSketchPoint, Линия_оси_X_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+      'Debug.Print Timer - t & " сек 3"
+       'Set Круг_эскиз = oSketches.Item(j).SketchCircles.AddByCenterRadius(oTG.CreatePoint2d(0, 0), 1)
+      'Создадим круг
+       'Фиксируем   круг якарем
+      ' Call oSketches.Item(j).GeometricConstraints.AddGround(Круг_эскиз)
+      ''Debug.Print Timer - t & " сек 3.1"   '0.875 сек
+      
+      
+      
+      'Задаем 10 мм размеру
+      oSketches.Item(j).DimensionConstraints.Item(oSketches.Item(j).DimensionConstraints.Count).Parameter.Value = 1
+      'Debug.Print Timer - t & " сек 4"
+      'обновляем эскиз
+      'oSketches.Item(j).Solve  'время выполения 1.308593 сек
+      'Debug.Print Timer - t & " сек 5"
+      'передадим 3D точку Y+1 в плоскость эскииза и строем линию по оси модели
+      Set Координаты_оси_Y_эскиза = oSketches.Item(j).ModelToSketchSpace(oTG.CreatePoint(Х, Y + 1, Z)) 'передача в эских точки из 3D пространства
+      'Debug.Print Timer - t & " сек 6"
+      'Set Точка_оси_Y_эскиза = oSketches.Item(j).SketchPoints.Add(Координаты_оси_Y_эскиза) 'создаем точку
+      Set Линия_оси_Y_Модели_в_эскизе = oSketches.Item(j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Координаты_оси_Y_эскиза) 'создадим линию из нуля по оси Y модели
+      'Debug.Print Timer - t & " сек 7"
+      'Задаем размер лини
+       Call oSketches.Item(j).DimensionConstraints.AddTwoPointDistance(Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Линия_оси_Y_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+      'Debug.Print Timer - t & " сек 8"
+      'Задаем 10 мм размеру
+      oSketches.Item(j).DimensionConstraints.Item(oSketches.Item(j).DimensionConstraints.Count).Parameter.Value = 1
+      'Debug.Print Timer - t & " сек 9"
+      'обновляем эскиз
+      oSketches.Item(j).Solve  'время выполения 1.113282 сек
+      'Debug.Print Timer - t & " сек 10"
+      'построем линии по осям Х и Y эскизи в эскизе
+      'Debug.Print Timer - t & " сек 11"
+      Set Линия_оси_X_эскиза = oSketches.Item(j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), oTG.CreatePoint2d(1, 0)) 'создадим линию из нуля по оси Х модели
+      'Debug.Print Timer - t & " сек 12"
+      Set Линия_оси_Y_эскиза = oSketches.Item(j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), oTG.CreatePoint2d(0, 1)) 'создадим линию из нуля по оси Y модели
+      
+      '--Замерим угол между осями
+      'oSketches.Item(j).Edit
+      Угол_между_осями_X_рад(j) = tools.GetAngle(Линия_оси_X_эскиза, Линия_оси_X_Модели_в_эскизе)
+      'Debug.Print Timer - t & " сек 13"
+      Угол_между_осями_X(j) = CSng(Format((Угол_между_осями_X_рад(j) * 180) / pi, "0.00000")) 'Угол, преобразованный в градусы
+       'Debug.Print Timer - t & " сек 14"
+      Угол_между_осями_Y_рад(j) = tools.GetAngle(Линия_оси_Y_эскиза, Линия_оси_Y_Модели_в_эскизе)
+      'Debug.Print Timer - t & " сек 15"
+      Угол_между_осями_Y(j) = CSng(Format((Угол_между_осями_Y_рад(j) * 180) / pi, "0.00000")) 'Угол, преобразованный в градусы
+      'Debug.Print Timer - t & " сек 16"
+      
+      'Проверяем по или против часовой стрелки мы получили эти грудусы (вращаем линию оси модели вокруг центра на этот градус если совпали то ок)
+      'создадим дуболь линии оси модели
+      'Set Дуболь1_Линия_оси_X_Модели_в_эскизе = oSketches.Item(j).SketchLines.AddByTwoPoints(Линия_оси_X_Модели_в_эскизе.StartSketchPoint, Линия_оси_X_Модели_в_эскизе.EndSketchPoint)
+      'Debug.Print Timer - t & " сек 17"
+      'Set Дуболь1_Линия_оси_Y_Модели_в_эскизе = oSketches.Item(j).SketchLines.AddByTwoPoints(Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Линия_оси_Y_Модели_в_эскизе.EndSketchPoint)
+       'Debug.Print Timer - t & " сек 18"
+       
+      '-----ось Х
+      'Добавляем в списк выделения нашу линию
+       oCreateObjectCollection.Clear 'чистим список выделения
+      'Debug.Print Timer - t & " сек 19"
+       oCreateObjectCollection.Add (Линия_оси_X_Модели_в_эскизе)
+      'Debug.Print Timer - t & " сек 20"
+       'Задаем размер лини
+      'Call oSketches.Item(j).DimensionConstraints.AddTwoPointDistance(Дуболь1_Линия_оси_X_Модели_в_эскизе.StartSketchPoint, Дуболь1_Линия_оси_X_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+      'магнитю линию
+      'Дуболь_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Merge (Линия_оси_Y_эскиза.StartSketchPoint)
+      'вращаем линию        'время выполения 0.378907 сек
+       'Set Дуболь_Линия_оси_X_Модели_в_эскизе_копия = oSketches.Item(j).RotateSketchObjects(oCreateObjectCollection, Дуболь1_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Geometry, 255 * pi / 180, True, False)
+       Set Дуболь_Линия_оси_X_Модели_в_эскизе_копия = oSketches.Item(j).RotateSketchObjects(oCreateObjectCollection, Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Geometry, Угол_между_осями_X_рад(j), True, False)
+      'Debug.Print Timer - t & " сек 21"
+       'Проверяем полученый угол Угол_между_осями_X_рад идет по часовой стрелки или против
+       'если точка повернутой линии на этот градус совподает  с точкой линии оси эскиза то по часовой (нет значет против)
+        Растояние_Х = Дуболь_Линия_оси_X_Модели_в_эскизе_копия(1).Geometry3d.EndPoint.DistanceTo(Линия_оси_X_эскиза.Geometry3d.EndPoint) ' Замеряем растояние между точками
+      'Debug.Print Timer - t & " сек 22"
+        Растояние_Х = CSng(Format(Растояние_Х, "0.00000"))
+      'Debug.Print Timer - t & " сек 23"
+      
+      '-----ось Y
+      'Добавляем в списк выделения нашу линию
+       oCreateObjectCollection.Clear 'чистим список выделения
+       'Debug.Print Timer - t & " сек 24"
+       oCreateObjectCollection.Add (Линия_оси_Y_Модели_в_эскизе)
+      'Debug.Print Timer - t & " сек 25"
+       'Задаем размер лини
+      'Call oSketches.Item(j).DimensionConstraints.AddTwoPointDistance(Дуболь1_Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Дуболь1_Линия_оси_Y_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+      'магнитю линию
+      'Дуболь_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Merge (Линия_оси_Y_эскиза.StartSketchPoint)
+      'вращаем линию           'время выполения 0.34375 сек
+       'Set Дуболь_Линия_оси_X_Модели_в_эскизе_копия = oSketches.Item(j).RotateSketchObjects(oCreateObjectCollection, Дуболь1_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Geometry, 255 * pi / 180, True, False)
+       Set Дуболь_Линия_оси_Y_Модели_в_эскизе_копия = oSketches.Item(j).RotateSketchObjects(oCreateObjectCollection, Линия_оси_Y_Модели_в_эскизе.StartSketchPoint.Geometry, Угол_между_осями_Y_рад(j), True, False)
+      'Debug.Print Timer - t & " сек 26"
+       'Проверяем полученый угол Угол_между_осями_X_рад идет по часовой стрелки или против
+       'если точка повернутой линии на этот градус совподает  с точкой линии оси эскиза то по часовой (нет значет против)
+        Растояние_Y = Дуболь_Линия_оси_Y_Модели_в_эскизе_копия(1).Geometry3d.EndPoint.DistanceTo(Линия_оси_Y_эскиза.Geometry3d.EndPoint) ' Замеряем растояние между точками
+       'Debug.Print Timer - t & " сек 27"
+        Растояние_Y = CSng(Format(Растояние_Y, "0.00000"))
+      'Debug.Print Timer - t & " сек 28"
+        
+      '-----Получаем градусы и коэфициенты отражения осей (типо был плюс стал минус)
+       'ищем истеный угол по оси Х
+       If Растояние_Х = 0 Then 'значить угол истеный (точки совпали)
+          Угол_между_осями_X_ист(j) = Угол_между_осями_X(j)
+       Else
+          If Угол_между_осями_X(j) = 0 Then
+               Угол_между_осями_X_ист(j) = 180
+          Else
+               Угол_между_осями_X_ист(j) = 360 - Угол_между_осями_X(j)
+          End If
+       End If
+       'ищем истеный угол по оси Y
+       If Растояние_Y = 0 Then 'значить угол истеный (точки совпали)
+          Угол_между_осями_Y_ист(j) = Угол_между_осями_Y(j)
+       Else
+          If Угол_между_осями_Y(j) = 0 Then
+               Угол_между_осями_Y_ист(j) = 180
+          Else
+               Угол_между_осями_Y_ист(j) = 360 - Угол_между_осями_Y(j)
+          End If
+       End If
+      'Debug.Print Timer - t & " сек 29"
+       
+       '-----Направление осей эскиза  (типо был плюс стал минус)
+       '-ось Х
+       If Угол_между_осями_X_ист(j) >= 180 Then
+         ' Направление осей эскиза (они бывают не совпадают с осями модели).
+          НаправлениеОсиЭскиза(j, 1) = -1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       Else
+          НаправлениеОсиЭскиза(j, 1) = 1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       End If
+       '-ось Y
+       If Угол_между_осями_Y_ист(j) >= 180 Then
+         ' Направление осей эскиза (они бывают не совпадают с осями модели).
+          НаправлениеОсиЭскиза(j, 2) = -1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       Else
+          НаправлениеОсиЭскиза(j, 2) = 1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       End If
+       
+       '---конечный  угол на который надо повернуть оси
+       If Угол_между_осями_Y_ист(j) >= 180 Then
+          Угол_Конечный(j) = Угол_между_осями_Y_ист(j) - 180
+       Else
+          Угол_Конечный(j) = Угол_между_осями_Y_ист(j)
+       End If
+      'Debug.Print Timer - t & " сек 30"
+      'Debug.Print " с"
+      'Debug.Print " с"
+       'oSketches.Item(j).ExitEdit
+      ' Doc.ComponentDefinition.Sketches.Item(j).SketchToModelSpace.
+    
+     '---Чистем эскиз от лишних вспомогательных линий
+       текущее_Колич_лин_в_зскизе = oSketches.Item(j).SketchLines.Count
+       For h = Колич_лин_в_зскизе + 1 To текущее_Колич_лин_в_зскизе
+          oSketches.Item(j).SketchLines.Item(oSketches.Item(j).SketchLines.Count).Delete 'удаляем линию
+       Next h
+
+    Next j
+      
+     ' If (Timer - t) > 60 Then
+     '    Debug.Print (Timer - t) / 60 & " мин" ' время  в сек
+     ' Else
+        ' Debug.Print Timer - t & " сек" ' время  в сек
+     ' End If
+      
+    'Записываем координаты точек эскизов в массивы
+    For j = 1 To UBound(Массив_точек_контура_вытягиваний, 1)
+
+      
+        'Позиция_элем(j, 1, 1) = oSketch3d.Item(j).SketchPoints3D.Item(1).Geometry.X ' получаем координату X из 3D эскиза
+        'Позиция_элем(j, 1, 1) = CSng(Format(Позиция_элем(j, 1, 1), "0.00000")) ' Округляем до 5 знака
+        'Позиция_элем(j, 1, 2) = oSketch3d.Item(j).SketchPoints3D.Item(1).Geometry.Y ' получаем координату Y
+        'Позиция_элем(j, 1, 2) = CSng(Format(Позиция_элем(j, 1, 2), "0.00000")) ' Округляем до 5 знака
+        'Позиция_элем(j, 1, 3) = oSketch3d.Item(j).SketchPoints3D.Item(1).Geometry.Z ' получаем координату Z
+        'Позиция_элем(j, 1, 3) = CSng(Format(Позиция_элем(j, 1, 3), "0.00000")) ' Округляем до 5 знака
+        
+        
+        'Координаты вытягиваемого эскиза
+        ПерваяТочка2DЭскиза(j, 1, 1) = oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint.Geometry.X ' получаем  координату X первой точки из 2D эскиза
+        ПерваяТочка2DЭскиза(j, 1, 1) = CSng(Format(ПерваяТочка2DЭскиза(j, 1, 1), "0.00000")) ' Округляем до 5 знака
+        ПерваяТочка2DЭскиза(j, 1, 2) = oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint.Geometry.Y ' получаем координату Y
+        ПерваяТочка2DЭскиза(j, 1, 2) = CSng(Format(ПерваяТочка2DЭскиза(j, 1, 2), "0.00000")) ' Округляем до 5 знака
+        ПерваяТочка2DЭскиза(j, 1, 3) = 0 ' получаем координату Z
+        ПерваяТочка2DЭскиза(j, 1, 3) = CSng(Format(ПерваяТочка2DЭскиза(j, 1, 3), "0.00000")) ' Округляем до 5 знака
+        For i = 1 To oFeatures.Item(j).Profile.Item(1).Count  'количество вытягиваний
+            
+            X = oFeatures.Item(j).Profile.Item(1).Item(i).StartSketchPoint.Geometry.X  ' получаем координату X из 3D эскиза
+            X = CSng(Format(X, "0.00000")) ' Округляем до 5 знака
+            Y = oFeatures.Item(j).Profile.Item(1).Item(i).StartSketchPoint.Geometry.Y  ' получаем координату Y
+            Y = CSng(Format(Y, "0.00000")) ' Округляем до 5 знака
+            Z = 0 ' получаем координату Z
+            Z = CSng(Format(Z, "0.00000")) ' Округляем до 5 знака
+            Массив_НЕотносит_коорд(j, 1, i, 1) = X 'Для справки
+            Массив_НЕотносит_коорд(j, 1, i, 2) = Y 'Для справки
+            Массив_НЕотносит_коорд(j, 1, i, 3) = Z 'Для справки
+            Массив_относит_коорд(j, 1, i, 1) = НаправлениеОсиЭскиза(j, 1) * (X - ПерваяТочка2DЭскиза(j, 1, 1))
+            Массив_относит_коорд(j, 1, i, 2) = НаправлениеОсиЭскиза(j, 2) * (Y - ПерваяТочка2DЭскиза(j, 1, 2))
+            Массив_относит_коорд(j, 1, i, 3) = Z - ПерваяТочка2DЭскиза(j, 1, 3)
+        Next i
+    Next j
+    
+    'Высота всех вытягиваний
+    Erase ВысотаВытягиваний 'отчистить массив
+    ReDim ВысотаВытягиваний(1 To oFeatures.Count) '(колич вытягиван) задаем размер таблицы
+    For j = 1 To oFeatures.Count ' опрос всех вытягиваний и других фиговин
+      ВысотаВытягиваний(j) = oFeatures.Item(j).Extent.Distance.Expression 'Пример  "15 мм" . Получаем высоту вытягивания в мм
+      ВысотаВытягиваний(j) = Replace(ВысотаВытягиваний(j), " мм", "") / 10 ' переводим мм в см. (координаты в см)
+    Next j
+    
+   ' Erase РастояниеОтПервПоверх
+   ' ReDim РастояниеОтПервПоверх(1 To oFeatures.Count)
+   ' Erase РастояниеОтПоследнПоверх
+   ' ReDim РастояниеОтПоследнПоверх(1 To oFeatures.Count)
+    
+   'Направление всех вытягиваний
+   ' For j = 1 To oFeatures.Count ' опрос всех вытягиваний и других фиговин
+   '   РастояниеОтПервПоверх(j) = tools.GetMinimumDistance(oFeatures.Item(j).Faces.Item(1), Doc.ComponentDefinition.WorkPoints.Item(1))
+   '   РастояниеОтПоследнПоверх(j) = tools.GetMinimumDistance(oFeatures.Item(j).Faces.Item(oFeatures.Item(j).Faces.Count), Doc.ComponentDefinition.WorkPoints.Item(1))
+   ' Next j
+
+     
+  '-*-*-*-*-*-*-ОПРЕДЕЛЯЕМ угол плоскостей ZX-*-*-*-*-*-*-*-*-*-*-*-
+      
+   Промежут_колич_плоск = Doc.ComponentDefinition.WorkPlanes.Count
+   
+    Dim ПоверхВытягиванийZX() As Inventor.WorkPlane
+    Erase ПоверхВытягиванийZX 'отчистить массив
+    ReDim ПоверхВытягиванийZX(1 To oFeatures.Count) '(колич вытягиван, три поверхности: нижняя центральная и верхняя)Задаем размер массива
+    Dim НовыйSketch() As PlanarSketch
+    Erase НовыйSketch 'отчистить массив
+    ReDim НовыйSketch(1 To oFeatures.Count) '(колич вытягиван, три поверхности: нижняя центральная и верхняя)Задаем размер массива
+    Erase Угол_между_осями_Y_ZX_рад
+    ReDim Угол_между_осями_Y_ZX_рад(1 To oSketches.Count)
+    Erase Угол_между_осями_Y_ZX
+    ReDim Угол_между_осями_Y_ZX(1 To oSketches.Count)
+    Erase Угол_между_осями_Y_ZX_ист
+    ReDim Угол_между_осями_Y_ZX_ист(1 To oSketches.Count)
+    Erase Угол_Конечный_ZX
+    ReDim Угол_Конечный_ZX(1 To oSketches.Count)
+    
+    For j = 1 To oFeatures.Count
+       'Создадим плоскость ZX из первой точки контура вытягивания эскиза
+       Set ПоверхВытягиванийZX(j) = oWorkPlanes.AddByPlaneAndPoint(oWorkPlanes.Item(1), oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint)
+       ПоверхВытягиванийZX(j).Name = "ZY из нулевой точки " & j
+       'создаем эскиз в новой плоскости
+       'расшифровка на сайте https://ru.wikibooks.org/wiki/Autodesk_lnventor_API._Первые_шаги/2D_эскиз#Создание_2D_эскиза
+        'Set НовыйSketch(j) = oSketches.AddWithOrientation(ПоверхВытягиванийZX(j), Doc.ComponentDefinition.WorkAxes.Item(2), True, False, Нулевая_точка_3D(j), False)
+        Set НовыйSketch(j) = oSketches.AddWithOrientation(ПоверхВытягиванийZX(j), Doc.ComponentDefinition.WorkAxes.Item(2), True, False, oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint, False)
+        НовыйSketch(j).Name = "Новый эскиз ZY " & j
+    '--Создаем линию в эскизе идущую к тень от эскиза для которого мы ищем угол наклона
+       ' ищем наиболее дольнию точку в контуре вытягивания от нуля по оси Y модели
+         Set Дальняя_Точка_из_друго_эскиза_в_эскизе = oTG.CreatePoint2d(0, 0)
+         For g = 1 To oFeatures.Item(j).Profile.Item(1).Count
+           'получаем координаты точки контура вятягивания из другого эскиза (для которого мы ищем угол наклона) в эскизе вспомагательном
+           Set Точка_из_друго_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(oFeatures.Item(j).Profile.Item(1).Item(g).StartSketchPoint.Geometry3d)
+           ' ищем наиболее дольнию точку от нуля
+           If Abs(Точка_из_друго_эскиза_в_эскизе.Y) > Abs(Дальняя_Точка_из_друго_эскиза_в_эскизе.Y) Then
+             Set Дальняя_Точка_из_друго_эскиза_в_эскизе = Точка_из_друго_эскиза_в_эскизе
+           End If
+         Next g
+         If Дальняя_Точка_из_друго_эскиза_в_эскизе.Y > 0 Then
+            Напрвыление_осиY = 1
+         End If
+         If Дальняя_Точка_из_друго_эскиза_в_эскизе.Y < 0 Then
+            Напрвыление_осиY = -1
+         End If
+         
+       'передадим 3D точку Y+1 в плоскость в другом эскизе (для которого мы ищем угол наклона)
+       Set Координаты_оси_Y_другой_эскизе_в_Модели = oSketches.Item(НачальнКоличЭскизов + j).SketchToModelSpace(oTG.CreatePoint2d(0, Напрвыление_осиY))  'передача в эских точки из 3D пространства
+       'передаем ее обратно в пространство модели
+       'Set Координаты_оси_Y_другого_эскиза_в_модели = oSketches.Item(j).SketchToModelSpace(Координаты_оси_Y_Модели_в_другом_эскизе) ' передаем из эскиза точку в модель
+       'передаем из пространства модели в эскиз
+       Set Координаты_оси_Y_Модели_в_эскизе = oSketches.Item(j).ModelToSketchSpace(Координаты_оси_Y_другой_эскизе_в_Модели) 'передача в эских точки из 3D пространства
+       '
+       Set Координаты_оси_Y_эскиз_в_Модель = oSketches.Item(j).SketchToModelSpace(Координаты_оси_Y_Модели_в_эскизе) 'передача в эских точки из 3D пространства
+       
+       Set Координаты_оси_Y_Модели_в_другой_эскизе = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(Координаты_оси_Y_эскиз_в_Модель) 'передача в эских точки из 3D пространства
+       'строем линию в другом эскизе от 0,0 до наиболле дальней точки другого эскиза от нуля
+       'Set Линия_оси_Y_другого_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Дальняя_Точка_из_друго_эскиза_в_эскизе) 'создадим линию из нуля по оси Y другого эскиза
+       Set Линия_оси_Y_другого_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Координаты_оси_Y_Модели_в_другой_эскизе) 'создадим линию из нуля по оси Y другого эскиза
+       
+       'Фиксируем начальную точку линии якарем
+       Call oSketches.Item(НачальнКоличЭскизов + j).GeometricConstraints.AddGround(Линия_оси_Y_другого_эскиза_в_эскизе.StartSketchPoint)
+       'Задаем размер лини
+       Call oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.AddTwoPointDistance(Линия_оси_Y_другого_эскиза_в_эскизе.StartSketchPoint, Линия_оси_Y_другого_эскиза_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+       'Задаем 10 мм размеру
+       oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Item(oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Count).Parameter.Value = 1
+       'обновляем эскиз
+       oSketches.Item(НачальнКоличЭскизов + j).Solve
+       'перетаскиваем начало линни в координаты 0,0
+       'Call Линия_оси_Y_другого_эскиза_в_эскизе.StartSketchPoint.MoveTo(oTG.CreatePoint2d(0, 0))
+    '--Создаем линию в эскизе идущую по оси Y модели
+       'Получим координаты Х,Y,Z первой точки вытягивания  эскиза
+       Х = Массив_точек_контура_вытягиваний(j, 1).X
+       Y = Массив_точек_контура_вытягиваний(j, 1).Y
+       Z = Массив_точек_контура_вытягиваний(j, 1).Z
+       'Найдем направление оси Y (ее строить в право или влево)
+       If Дальняя_Точка_из_друго_эскиза_в_эскизе.Y > 0 Then
+          НаправлениеY = 1
+       Else
+          НаправлениеY = -1
+       End If
+       'передадим 3D точку Y+1 в плоскость эскииза и строем линию по оси модели
+       Set Координаты_оси_Y_Модели_в_эскиза = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(oTG.CreatePoint(Х, Y + НаправлениеY, Z)) 'передача в эских точки из 3D пространства
+       Set Линия_оси_Y_Модели_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Координаты_оси_Y_Модели_в_эскиза) 'создадим линию из нуля по оси Y модели
+       'Задаем размер лини
+       Call oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.AddTwoPointDistance(Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Линия_оси_Y_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+       'Задаем 10 мм размеру
+       oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Item(oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Count).Parameter.Value = 1
+       'обновляем эскиз
+       oSketches.Item(НачальнКоличЭскизов + j).Solve
+      
+      
+      
+      
+      '--Замерим угол между осями
+      
+      'oSketches.Item(j).Edit
+      Угол_между_осями_Y_ZX_рад(j) = tools.GetAngle(Линия_оси_Y_Модели_в_эскизе, Линия_оси_Y_другого_эскиза_в_эскизе)
+      Угол_между_осями_Y_ZX(j) = CSng(Format((Угол_между_осями_Y_ZX_рад(j) * 180) / pi, "0.00000")) 'Угол, преобразованный в градусы
+       
+      'создадим дуболь линии оси модели
+      Set Дуболь1_Линия_оси_Y_Модели_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Линия_оси_Y_Модели_в_эскизе.EndSketchPoint)
+           
+      '-----ось Y
+      'Добавляем в списк выделения нашу линию
+       oCreateObjectCollection.Clear 'чистим список выделения
+       oCreateObjectCollection.Add (Дуболь1_Линия_оси_Y_Модели_в_эскизе)
+       'Задаем размер лини
+      'Call oSketches.Item(j).DimensionConstraints.AddTwoPointDistance(Дуболь1_Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Дуболь1_Линия_оси_Y_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+      'магнитю линию
+      'Дуболь_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Merge (Линия_оси_Y_эскиза.StartSketchPoint)
+      'вращаем линию
+       'Set Дуболь_Линия_оси_X_Модели_в_эскизе_копия = oSketches.Item(j).RotateSketchObjects(oCreateObjectCollection, Дуболь1_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Geometry, 255 * pi / 180, True, False)
+       Set Дуболь_Линия_оси_Y_Модели_в_эскизе_копия = oSketches.Item(НачальнКоличЭскизов + j).RotateSketchObjects(oCreateObjectCollection, Дуболь1_Линия_оси_Y_Модели_в_эскизе.StartSketchPoint.Geometry, Угол_между_осями_Y_ZX_рад(j), True, False)
+       'Проверяем полученый угол Угол_между_осями_X_рад идет по часовой стрелки или против
+       'если точка повернутой линии на этот градус совподает  с точкой линии оси эскиза то по часовой (нет значет против)
+        Растояние_Y = Дуболь_Линия_оси_Y_Модели_в_эскизе_копия(1).Geometry3d.EndPoint.DistanceTo(Линия_оси_Y_другого_эскиза_в_эскизе.Geometry3d.EndPoint) ' Замеряем растояние между точками
+        Растояние_Y = CSng(Format(Растояние_Y, "0.00000"))
+        
+      '-----Получаем градусы и коэфициенты отражения осей (типо был плюс стал минус)
+       'ищем истеный угол по оси Y
+       If Растояние_Y = 0 Then 'значить угол истеный (точки совпали)
+          Угол_между_осями_Y_ZX_ист(j) = Угол_между_осями_Y_ZX(j)
+       Else
+          'If Угол_между_осями_Y_ZX(j) = 0 Then
+          '     Угол_между_осями_Y_ZX_ист(j) = 180
+          'Else
+          '     Угол_между_осями_Y_ZX_ист(j) = (360 - Угол_между_осями_Y_ZX(j))
+          'End If
+          Угол_между_осями_Y_ZX_ист(j) = -1 * Угол_между_осями_Y_ZX(j)
+       End If
+       
+       '-----Направление осей эскиза  (типо был плюс стал минус)
+       '-ось Y
+       'If Угол_между_осями_Y_ZX_ист(j) >= 180 Then
+       '  ' Направление осей эскиза (они бывают не совпадают с осями модели).
+       '   НаправлениеОсиЭскиза(j, 2) = -1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       'Else
+       '   НаправлениеОсиЭскиза(j, 2) = 1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       'End If
+       
+       '---конечный  угол на который надо повернуть плоскость XZ
+       If Угол_между_осями_Y_ZX_ист(j) >= 180 Then
+          Угол_Конечный_ZX(j) = Угол_между_осями_Y_ZX_ист(j) - 180
+       Else
+          Угол_Конечный_ZX(j) = Угол_между_осями_Y_ZX_ист(j)
+       End If
+       
+       
+       
+       
+       
+       
+       'Call Линия_оси_Y_другого_эскиза_в_эскизе.EndSketchPoint.MoveTo(Координаты_оси_Y_другого_эскиза_в_эскизе)
+       'Set ТочкаЭскизаY=oSketches.Item(j).SketchPoints.Add(oTG.CreatePoint2d(
+       'Получим координаты Х,Y,Z нулевой точки из другого эскиза (у которого определяем угол)
+       'Х = oSketches.Item(j).OriginPointGeometry.X
+       'Y = oSketches.Item(j).OriginPointGeometry.Y
+       'Z = oSketches.Item(j).OriginPointGeometry.Z
+       'получем координаты (0,1) из другого эскиза (у которого определяем угол)
+       'Хрень Set Координаты_оси_Y_Эскиз_в_эскиза = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(oTG.CreatePoint(Х, Y + 1, Z))
+       
+    Next j
+   
+  
+  '-*-*-*-*-*-*-ОПРЕДЕЛЯЕМ угол плоскостей ZY-*-*-*-*-*-*-*-*-*-*-*-
+
+
+'Удалим плоскости созданые "ОПРЕДЕЛЯЕМ угол плоскостей ZX"
+ For h = Промежут_колич_плоск + 1 To Doc.ComponentDefinition.WorkPlanes.Count
+     Doc.ComponentDefinition.WorkPlanes.Item(Промежут_колич_плоск + 1).Delete
+ Next h
+  
+    Dim ПоверхВытягиванийZY() As Inventor.WorkPlane
+    Erase ПоверхВытягиванийZY 'отчистить массив
+    ReDim ПоверхВытягиванийZY(1 To oFeatures.Count) '(колич вытягиван, три поверхности: нижняя центральная и верхняя)Задаем размер массива
+    'Dim НовыйSketch() As PlanarSketch
+    Erase НовыйSketch 'отчистить массив
+    ReDim НовыйSketch(1 To oFeatures.Count) '(колич вытягиван, три поверхности: нижняя центральная и верхняя)Задаем размер массива
+    Erase Угол_между_осями_X_ZY_рад
+    ReDim Угол_между_осями_X_ZY_рад(1 To oSketches.Count)
+    Erase Угол_между_осями_X_ZY
+    ReDim Угол_между_осями_X_ZY(1 To oSketches.Count)
+    Erase Угол_между_осями_X_ZY_ист
+    ReDim Угол_между_осями_X_ZY_ист(1 To oSketches.Count)
+    Erase Угол_Конечный_ZY
+    ReDim Угол_Конечный_ZY(1 To oSketches.Count)
+    
+    For j = 1 To oFeatures.Count
+       'Создадим плоскость ZX из первой точки контура вытягивания эскиза
+       Set ПоверхВытягиванийZY(j) = oWorkPlanes.AddByPlaneAndPoint(oWorkPlanes.Item(2), oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint)
+       ПоверхВытягиванийZY(j).Name = "ZX из нулевой точки " & j
+       'создаем эскиз в новой плоскости
+       'расшифровка на сайте https://ru.wikibooks.org/wiki/Autodesk_lnventor_API._Первые_шаги/2D_эскиз#Создание_2D_эскиза
+        'Set НовыйSketch(j) = oSketches.AddWithOrientation(ПоверхВытягиванийZY(j), Doc.ComponentDefinition.WorkAxes.Item(1), True, False, Нулевая_точка_3D(j), False)
+        Set НовыйSketch(j) = oSketches.AddWithOrientation(ПоверхВытягиванийZY(j), Doc.ComponentDefinition.WorkAxes.Item(1), True, True, oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint, False)
+        НовыйSketch(j).Name = "Новый эскиз ZX " & j
+    '--Создаем линию в эскизе идущую к тень от эскиза для которого мы ищем угол наклона
+       ' ищем наиболее дольнию точку в контуре вытягивания от нуля по оси Y модели
+         Set Дальняя_Точка_из_друго_эскиза_в_эскизе = oTG.CreatePoint2d(0, 0)
+         For g = 1 To oFeatures.Item(j).Profile.Item(1).Count
+           'получаем координаты точки контура вятягивания из другого эскиза (для которого мы ищем угол наклона) в эскизе вспомагательном
+           Set Точка_из_друго_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(oFeatures.Item(j).Profile.Item(1).Item(g).StartSketchPoint.Geometry3d)
+           ' ищем наиболее дольнию точку от нуля
+           If Abs(Точка_из_друго_эскиза_в_эскизе.X) > Abs(Дальняя_Точка_из_друго_эскиза_в_эскизе.X) Then
+             Set Дальняя_Точка_из_друго_эскиза_в_эскизе = Точка_из_друго_эскиза_в_эскизе
+           End If
+         Next g
+         If Дальняя_Точка_из_друго_эскиза_в_эскизе.X > 0 Then
+            Напрвыление_осиX = 1
+         End If
+         If Дальняя_Точка_из_друго_эскиза_в_эскизе.X < 0 Then
+            Напрвыление_осиX = -1
+         End If
+         
+       'передадим 3D точку Y+1 в плоскость в другом эскизе (для которого мы ищем угол наклона)
+       Set Координаты_оси_X_другой_эскизе_в_Модели = oSketches.Item(НачальнКоличЭскизов + j).SketchToModelSpace(oTG.CreatePoint2d(Напрвыление_осиX, 0))  'передача в эских точки из 3D пространства
+       'передаем ее обратно в пространство модели
+       'Set Координаты_оси_Y_другого_эскиза_в_модели = oSketches.Item(j).SketchToModelSpace(Координаты_оси_Y_Модели_в_другом_эскизе) ' передаем из эскиза точку в модель
+       'передаем из пространства модели в эскиз
+       Set Координаты_оси_X_Модели_в_эскизе = oSketches.Item(j).ModelToSketchSpace(Координаты_оси_X_другой_эскизе_в_Модели) 'передача в эских точки из 3D пространства
+       '
+       Set Координаты_оси_X_эскиз_в_Модель = oSketches.Item(j).SketchToModelSpace(Координаты_оси_X_Модели_в_эскизе) 'передача в эских точки из 3D пространства
+       
+       Set Координаты_оси_X_Модели_в_другой_эскизе = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(Координаты_оси_X_эскиз_в_Модель) 'передача в эских точки из 3D пространства
+       'строем линию в другом эскизе от 0,0 до наиболле дальней точки другого эскиза от нуля
+       'Set Линия_оси_Y_другого_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Дальняя_Точка_из_друго_эскиза_в_эскизе) 'создадим линию из нуля по оси Y другого эскиза
+       Set Линия_оси_X_другого_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Координаты_оси_X_Модели_в_другой_эскизе) 'создадим линию из нуля по оси Y другого эскиза
+
+       'передадим 3D точку Y+1 в плоскость в другом эскизе (для которого мы ищем угол наклона)
+       'Set Координаты_оси_Y_Модели_в_другом_эскизе = oSketches.Item(j).ModelToSketchSpace(oTG.CreatePoint(Х, Y + 1, Z)) 'передача в эских точки из 3D пространства
+       'передаем ее обратно в пространство модели
+       'Set Координаты_оси_Y_другого_эскиза_в_модели = oSketches.Item(j).SketchToModelSpace(Координаты_оси_Y_Модели_в_другом_эскизе) ' передаем из эскиза точку в модель
+       'передаем из пространства модели в эскиз
+       'Set Координаты_оси_Y_другого_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(Координаты_оси_Y_другого_эскиза_в_модели) 'передача в эских точки из 3D пространства
+       'строем линию в другом эскизе от 0,0 до наиболле дальней точки другого эскиза от нуля
+       'Set Линия_оси_X_другого_эскиза_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Дальняя_Точка_из_друго_эскиза_в_эскизе) 'создадим линию из нуля по оси Y другого эскиза
+       'Фиксируем начальную точку линии якарем
+       Call oSketches.Item(НачальнКоличЭскизов + j).GeometricConstraints.AddGround(Линия_оси_X_другого_эскиза_в_эскизе.StartSketchPoint)
+       'Задаем размер лини
+       Call oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.AddTwoPointDistance(Линия_оси_X_другого_эскиза_в_эскизе.StartSketchPoint, Линия_оси_X_другого_эскиза_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+       'Задаем 10 мм размеру
+       oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Item(oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Count).Parameter.Value = 1
+       'обновляем эскиз
+       oSketches.Item(НачальнКоличЭскизов + j).Solve
+       'перетаскиваем начало линни в координаты 0,0
+       'Call Линия_оси_Y_другого_эскиза_в_эскизе.StartSketchPoint.MoveTo(oTG.CreatePoint2d(0, 0))
+    '--Создаем линию в эскизе идущую по оси Y модели
+       'Получим координаты Х,Y,Z первой точки вытягивания  эскиза
+       Х = Массив_точек_контура_вытягиваний(j, 1).X
+       Y = Массив_точек_контура_вытягиваний(j, 1).Y
+       Z = Массив_точек_контура_вытягиваний(j, 1).Z
+       'Найдем направление оси Y (ее строить в право или влево)
+       If Дальняя_Точка_из_друго_эскиза_в_эскизе.X > 0 Then
+          НаправлениеX = 1
+       Else
+          НаправлениеX = -1
+       End If
+       'передадим 3D точку X+1 в плоскость эскииза и строем линию по оси модели
+       Set Координаты_оси_X_Модели_в_эскиза = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(oTG.CreatePoint(Х + НаправлениеX, Y, Z)) 'передача в эских точки из 3D пространства
+       Set Линия_оси_X_Модели_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(oTG.CreatePoint2d(0, 0), Координаты_оси_X_Модели_в_эскиза) 'создадим линию из нуля по оси Y модели
+       'Задаем размер лини
+       Call oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.AddTwoPointDistance(Линия_оси_X_Модели_в_эскизе.StartSketchPoint, Линия_оси_X_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+       'Задаем 10 мм размеру
+       oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Item(oSketches.Item(НачальнКоличЭскизов + j).DimensionConstraints.Count).Parameter.Value = 1
+       'обновляем эскиз
+       oSketches.Item(НачальнКоличЭскизов + j).Solve
+      
+      
+      
+      
+      '--Замерим угол между осями
+      
+      'oSketches.Item(j).Edit
+      Угол_между_осями_X_ZY_рад(j) = tools.GetAngle(Линия_оси_X_Модели_в_эскизе, Линия_оси_X_другого_эскиза_в_эскизе)
+      Угол_между_осями_X_ZY(j) = CSng(Format((Угол_между_осями_X_ZY_рад(j) * 180) / pi, "0.00000")) 'Угол, преобразованный в градусы
+       
+      'создадим дуболь линии оси модели
+      Set Дуболь1_Линия_оси_X_Модели_в_эскизе = oSketches.Item(НачальнКоличЭскизов + j).SketchLines.AddByTwoPoints(Линия_оси_X_Модели_в_эскизе.StartSketchPoint, Линия_оси_X_Модели_в_эскизе.EndSketchPoint)
+           
+      '-----ось Y
+      'Добавляем в списк выделения нашу линию
+       oCreateObjectCollection.Clear 'чистим список выделения
+       oCreateObjectCollection.Add (Дуболь1_Линия_оси_X_Модели_в_эскизе)
+       'Задаем размер лини
+      'Call oSketches.Item(j).DimensionConstraints.AddTwoPointDistance(Дуболь1_Линия_оси_Y_Модели_в_эскизе.StartSketchPoint, Дуболь1_Линия_оси_Y_Модели_в_эскизе.EndSketchPoint, kAlignedDim, oTG.CreatePoint2d(0, 0), False)
+      'магнитю линию
+      'Дуболь_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Merge (Линия_оси_Y_эскиза.StartSketchPoint)
+      'вращаем линию
+       'Set Дуболь_Линия_оси_X_Модели_в_эскизе_копия = oSketches.Item(j).RotateSketchObjects(oCreateObjectCollection, Дуболь1_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Geometry, 255 * pi / 180, True, False)
+       Set Дуболь_Линия_оси_X_Модели_в_эскизе_копия = oSketches.Item(НачальнКоличЭскизов + j).RotateSketchObjects(oCreateObjectCollection, Дуболь1_Линия_оси_X_Модели_в_эскизе.StartSketchPoint.Geometry, Угол_между_осями_X_ZY_рад(j), True, False)
+       'Проверяем полученый угол Угол_между_осями_X_рад идет по часовой стрелки или против
+       'если точка повернутой линии на этот градус совподает  с точкой линии оси эскиза то по часовой (нет значет против)
+        Растояние_X = Дуболь_Линия_оси_X_Модели_в_эскизе_копия(1).Geometry3d.EndPoint.DistanceTo(Линия_оси_X_другого_эскиза_в_эскизе.Geometry3d.EndPoint) ' Замеряем растояние между точками
+        Растояние_X = CSng(Format(Растояние_X, "0.00000"))
+        
+      '-----Получаем градусы и коэфициенты отражения осей (типо был плюс стал минус)
+       'ищем истеный угол по оси Y
+       If Растояние_X = 0 Then 'значить угол истеный (точки совпали)
+          Угол_между_осями_X_ZY_ист(j) = Угол_между_осями_X_ZY(j)
+       Else
+          'If Угол_между_осями_Y_ZX(j) = 0 Then
+          '     Угол_между_осями_Y_ZX_ист(j) = 180
+          'Else
+          '     Угол_между_осями_Y_ZX_ист(j) = (360 - Угол_между_осями_Y_ZX(j))
+          'End If
+          Угол_между_осями_X_ZY_ист(j) = -1 * Угол_между_осями_X_ZY(j)
+       End If
+       
+       '-----Направление осей эскиза  (типо был плюс стал минус)
+       '-ось Y
+       'If Угол_между_осями_Y_ZX_ист(j) >= 180 Then
+       '  ' Направление осей эскиза (они бывают не совпадают с осями модели).
+       '   НаправлениеОсиЭскиза(j, 2) = -1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       'Else
+       '   НаправлениеОсиЭскиза(j, 2) = 1 '(Колич элементов вытяг или др.,три оси X,Y и Z)
+       'End If
+       
+       '---конечный  угол на который надо повернуть плоскость XZ
+       If Угол_между_осями_X_ZY_ист(j) >= 180 Then
+          Угол_Конечный_ZY(j) = Угол_между_осями_X_ZY_ист(j) - 180
+       Else
+          Угол_Конечный_ZY(j) = Угол_между_осями_X_ZY_ист(j)
+       End If
+       
+       
+       
+       
+       
+       
+       'Call Линия_оси_Y_другого_эскиза_в_эскизе.EndSketchPoint.MoveTo(Координаты_оси_Y_другого_эскиза_в_эскизе)
+       'Set ТочкаЭскизаY=oSketches.Item(j).SketchPoints.Add(oTG.CreatePoint2d(
+       'Получим координаты Х,Y,Z нулевой точки из другого эскиза (у которого определяем угол)
+       'Х = oSketches.Item(j).OriginPointGeometry.X
+       'Y = oSketches.Item(j).OriginPointGeometry.Y
+       'Z = oSketches.Item(j).OriginPointGeometry.Z
+       'получем координаты (0,1) из другого эскиза (у которого определяем угол)
+       'Хрень Set Координаты_оси_Y_Эскиз_в_эскиза = oSketches.Item(НачальнКоличЭскизов + j).ModelToSketchSpace(oTG.CreatePoint(Х, Y + 1, Z))
+       
+    Next j
+   
+   
+   
+   
+   
+   
+   
+    'ХЛАМ Угол наклона для всех вытягиваний относительно стандартных плоскастей X, Y, Z
+    Erase УголВытягиваний 'отчистить массив
+    ReDim УголВытягиваний(1 To oFeatures.Count, 1 To 3) '(колич вытягиван, три угла) задаем размер таблицы
+    For j = 1 To oFeatures.Count '
+       УголВытягиваний(j, 1) = Угол_Конечный(j) 'в градусах
+       УголВытягиваний(j, 2) = Угол_Конечный_ZX(j) 'в градусах
+       УголВытягиваний(j, 3) = Угол_Конечный_ZY(j) 'в градусах
+       'УголВытягиваний(j, 2) = tools.GetAngle(Doc.ComponentDefinition.WorkPlanes.Item("YZ Plane"), ПоверхВытягиваний(j, 1))
+       'УголВытягиваний(j, 2) = CSng(Format((УголВытягиваний(j, 2) * 180) / pi, "0.00000")) 'Угол, преобразованный в градусы
+       'УголВытягиваний(j, 3) = tools.GetAngle(Doc.ComponentDefinition.WorkPlanes.Item("XZ Plane"), ПоверхВытягиваний(j, 1))
+       'УголВытягиваний(j, 3) = CSng(Format((УголВытягиваний(j, 3) * 180) / pi, "0.00000")) 'Угол, преобразованный в градусы
+    Next j
+
+
+
+  '-*-*-*-*-*-*-Создаем нижнию плоскость вытягивания-*-*-*-*-*-*-*-*-*-*-*-
+
+    Dim ПоверхВытягиваний() As Inventor.WorkPlane
+    Erase ПоверхВытягиваний 'отчистить массив
+    ReDim ПоверхВытягиваний(1 To oFeatures.Count, 1 To 3) '(колич вытягиван, три поверхности: нижняя центральная и верхняя)Задаем размер массива
+    'Dim T_WPs_ As WorkPoint
+    For j = 1 To oFeatures.Count '
+       'создаем плоскость по 3 точкам
+         If oFeatures.Item(j).Profile.Item(1).Count > 3 Then 'если точек болье 3
+            'получем три точки не лежащие на одной прямой
+            номер_точки = 0
+            For g = 1 To oFeatures.Item(j).Profile.Item(1).Count
+               Х1 = oFeatures.Item(j).Profile.Item(1).Item(g).StartSketchPoint.Geometry.X
+               Y1 = oFeatures.Item(j).Profile.Item(1).Item(g).StartSketchPoint.Geometry.Y
+               Х2 = oFeatures.Item(j).Profile.Item(1).Item(g + 2).StartSketchPoint.Geometry.X
+               Y2 = oFeatures.Item(j).Profile.Item(1).Item(g + 2).StartSketchPoint.Geometry.Y
+               Хц = oFeatures.Item(j).Profile.Item(1).Item(g + 1).StartSketchPoint.Geometry.X
+               Yц = oFeatures.Item(j).Profile.Item(1).Item(g + 1).StartSketchPoint.Geometry.Y
+               номер_точки = g
+               результат = (Хц - Х1) * (Y2 - Y1) - (Х2 - Х1) * (Yц - Y1)
+               результат = CSng(Format(результат, "0.00000"))
+               If результат <> 0 Then 'если сошлось значет мы нашли нужные точки
+                  Exit For
+               End If
+            Next g
+              Set ПоверхВытягиваний(j, 1) = Doc.ComponentDefinition.WorkPlanes.AddByThreePoints( _
+                  oFeatures.Item(j).Profile.Item(1).Item(номер_точки).StartSketchPoint, _
+                  oFeatures.Item(j).Profile.Item(1).Item(номер_точки + 1).StartSketchPoint, _
+                  oFeatures.Item(j).Profile.Item(1).Item(номер_точки + 2).StartSketchPoint)
+         Else 'если точек только 3
+              Set ПоверхВытягиваний(j, 1) = Doc.ComponentDefinition.WorkPlanes.AddByThreePoints( _
+                  oFeatures.Item(j).Profile.Item(1).Item(1).StartSketchPoint, _
+                  oFeatures.Item(j).Profile.Item(1).Item(2).StartSketchPoint, _
+                  oFeatures.Item(j).Profile.Item(1).Item(3).StartSketchPoint)
+         End If
+  ' Создаеми плоскости на нижней  поверхностиях для всех вытягиван
+         
+       'Последняя плоскость в списке
+       'Dim плоск As WorkPlane
+       'Set плоск = Doc.ComponentDefinition.WorkPlanes.Item(Doc.ComponentDefinition.WorkPlanes.Count)
+       'создать точку у точки минемума диапозоного каводрата вокруг вытягивания
+       'Dim T_WPs As WorkPoint
+       'Set T_WPs = oWorkPoints.AddFixed(oFeatures.Item(j).RangeBox.MinPoint)
+      ' Создание новой рабочей плоскости
+       'Set ПоверхВытягиваний(j, 3) = Doc.ComponentDefinition.WorkPlanes.AddByPlaneAndPoint(плоск, T_WPs)
+       'Если растояние межу созданой плоскатью и нижней плоскатью выття гивания равно 0 делаем новую плоскость
+       'Растояние = tools.GetMinimumDistance(ПоверхВытягиваний(j, 1), ПоверхВытягиваний(j, 3))
+       'If Растояние = 0 Then
+         'создать точку у точки максимума диапозоного каводрата вокруг вытягивания
+       '  Doc.ComponentDefinition.WorkPlanes.Item(Doc.ComponentDefinition.WorkPlanes.Count).Delete 'удалить последнюю не правельную плоскость
+       '  Set T_WPs = oWorkPoints.AddFixed(oFeatures.Item(j).RangeBox.MaxPoint)
+         'создаем плоскость у дальнего края
+       '  Set ПоверхВытягиваний(j, 3) = Doc.ComponentDefinition.WorkPlanes.AddByPlaneAndPoint(ПоверхВытягиваний(j, 1), T_WPs)
+       'End If
+    Next j
+    
+    
+      'Угол_между_осями_Y_ZX(j) = CSng(Format((Нулевая_точка_3D(j).Point.X, "0.00000"))
+
+    
+    
+'-----СОЗДАЕМ текстовый документ с камандами для Авевы-------
+
+пут_и_имя = Doc.FullDocumentName
+    
+'открыть (создает) имееющейся файл и сохранить
+Open пут_и_имя & "_страницы.txt" For Output As #1
+
+'Пишем в файл по путно опрашивания массивы с координатами
+    For j = 1 To UBound(Массив_точек_контура_вытягиваний, 1)    'Doc.ComponentDefinition.Sketches3D.Count
+        Print #1, "New Extrusion"
+        Print #1, "POS E "; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).X, "0.00000")) * 10; _
+                     " N "; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Y, "0.00000")) * 10; _
+                     " U "; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Z, "0.00000")) * 10   'заносим координаты X,Y,Z начальной точки в мм
+        Print #1, "Height "; ВысотаВытягиваний(j) * 10 'высота вытягивания в мм
+        Print #1, "ROTATE through X"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).X, "0.00000")) * 10; _
+                                 " Y"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Y, "0.00000")) * 10; _
+                                 " Z"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Z, "0.00000")) * 10; _
+                                 " wrt WORL about Z wrt WORL by "; Угол_Конечный(j); "degree"   'вращаем относительно слоскости "XY Plane"
+        Print #1, "ROTATE through X"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).X, "0.00000")) * 10; _
+                                 " Y"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Y, "0.00000")) * 10; _
+                                 " Z"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Z, "0.00000")) * 10; _
+                                 " wrt WORL about X wrt WORL by "; Угол_Конечный_ZX(j); "degree" 'вращаем относительно слоскости "YZ Plane"
+        Print #1, "ROTATE through X"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).X, "0.00000")) * 10; _
+                                 " Y"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Y, "0.00000")) * 10; _
+                                 " Z"; CSng(Format(Массив_точек_контура_вытягиваний(j, 1).Z, "0.00000")) * 10; _
+                                 " wrt WORL about Y wrt WORL by "; (Угол_Конечный_ZY(j)); "degree" 'вращаем относительно слоскости "XZ Plane"
+        'Print #1, "ROTATE through X0  Y0  Z0 wrt Extrusion about Y wrt Extrusion by "; (УголВытягиваний(j, 1)) * -1; "degree"  'вращаем относительно слоскости "XY Plane"
+        'Print #1, "ROTATE through X0  Y0  Z0 wrt Extrusion about X wrt Extrusion by "; (УголВытягиваний(j, 2) - 90) * -1; "degree" 'вращаем относительно слоскости "YZ Plane"
+        'Print #1, "ROTATE through X0  Y0  Z0 wrt Extrusion about Z wrt Extrusion by "; (УголВытягиваний(j, 3) - 90) * -1; "degree" 'вращаем относительно слоскости "XZ Plane"
+        Print #1, "New loop"
+        For i = 1 To UBound(Массив_относит_коорд, 3)  'oSketch3d.Item(j).SketchPoints3D.Count
+            If Массив_относит_коорд(j, 1, i, 1) <> "" Then
+            Print #1, "New vert POS E "; Массив_относит_коорд(j, 1, i, 1) * 10; _
+                                  " N "; Массив_относит_коорд(j, 1, i, 2) * 10; _
+                                  " U "; Массив_относит_коорд(j, 1, i, 3) * 10 'вписываем относительные координаты X,Y,Z
+            End If
+            
+        Next i
+    Next j
+Print #1, 'пустая строка
+Close #1
+    
+    
+ '-----Удаляем 3D эскизы и точки
+ For h = 1 To Doc.ComponentDefinition.WorkPoints.Count - 1
+     Doc.ComponentDefinition.WorkPoints.Item(2).Delete
+ Next h
+ For h = 1 To Doc.ComponentDefinition.Sketches3D.Count
+     Doc.ComponentDefinition.Sketches3D.Item(1).Delete
+ Next h
+ For h = НачальнКоличПлоск + 1 To Doc.ComponentDefinition.WorkPlanes.Count
+     Doc.ComponentDefinition.WorkPlanes.Item(НачальнКоличПлоск + 1).Delete
+ Next h
+ 
+'New Extrusion
+'POS E 0 N 0 U 0
+'Height 200
+'New loop
+'New vert POS E 100 N 200 U 0
+'New vert POS E 400 N 600 U 0
+'New vert POS E 700 N 800 U 0
+    
+    
+    
+    
+    If (Timer - t) > 60 Then
+      Debug.Print (Timer - t) / 60 & " мин" ' время  в сек
+      Else
+      Debug.Print Timer - t & " сек" ' время  в сек
+    End If
+    
+End Sub
+
